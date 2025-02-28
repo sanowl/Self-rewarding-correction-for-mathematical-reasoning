@@ -1,4 +1,3 @@
-import random
 import re
 import json
 import math
@@ -7,6 +6,7 @@ import time
 from typing import List, Dict, Tuple, Optional, Union, Any
 from dataclasses import dataclass
 import logging
+import secrets
 
 # Configure logging
 logging.basicConfig(
@@ -136,7 +136,7 @@ class SelfRewardingReasoner:
         }
         
         accuracy = difficulty_accuracy.get(problem.difficulty, 0.5)
-        is_correct = random.random() < accuracy
+        is_correct = secrets.SystemRandom().random() < accuracy
         
         # Generate mock reasoning
         if is_correct:
@@ -166,7 +166,7 @@ class SelfRewardingReasoner:
             recognition_accuracy = self.rewarding_accuracy['incorrect']
         
         # Determine if the evaluation is accurate based on the recognition accuracy
-        evaluation_is_accurate = random.random() < recognition_accuracy
+        evaluation_is_accurate = secrets.SystemRandom().random() < recognition_accuracy
         
         # Based on accuracy, determine the evaluation result
         if evaluation_is_accurate:
@@ -199,7 +199,7 @@ class SelfRewardingReasoner:
             return attempt
         
         # Model attempts to correct its solution
-        correction_succeeds = random.random() < self.correction_accuracy
+        correction_succeeds = secrets.SystemRandom().random() < self.correction_accuracy
         
         if correction_succeeds:
             # The model successfully corrects its mistake
@@ -267,7 +267,7 @@ class SelfRewardingReasoner:
         try:
             # For numeric answers, perturb the correct value
             value = float(correct_answer)
-            perturbation = random.choice([0.9, 1.1, 0.5, 2.0, -1.0])
+            perturbation = secrets.choice([0.9, 1.1, 0.5, 2.0, -1.0])
             wrong_value = value * perturbation
             
             # Format similarly to the correct answer
@@ -283,7 +283,7 @@ class SelfRewardingReasoner:
                 f"-{correct_answer}",  # Negate
                 "0"  # Default fallback
             ]
-            return random.choice(options)
+            return secrets.choice(options)
 
 
 class Evaluator:
@@ -448,7 +448,7 @@ def run_experiment(num_problems=50,
                     raise ValidationError(f"Reward accuracy '{key}' must be between 0 and 1")
         
         if seed is not None:
-            random.seed(seed)
+            secrets.SystemRandom().seed(seed)
             np.random.seed(seed)
         
         # Sample or generate problems
