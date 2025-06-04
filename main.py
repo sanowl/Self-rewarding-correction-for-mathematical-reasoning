@@ -1,4 +1,3 @@
-import random
 import re
 import json
 import math
@@ -10,6 +9,7 @@ import logging
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from tqdm import tqdm
+import secrets
 
 # Configure logging
 logging.basicConfig(
@@ -359,7 +359,7 @@ Corrected solution:"""
         }
         
         accuracy = difficulty_accuracy.get(problem.difficulty, 0.5)
-        is_correct = random.random() < accuracy
+        is_correct = secrets.SystemRandom().random() < accuracy
         
         if is_correct:
             reasoning = f"To solve the problem '{problem.prompt}', I'll work through it step by step... [reasoning steps] ... Therefore, the answer is {problem.correct_answer}."
@@ -380,7 +380,7 @@ Corrected solution:"""
         else:
             recognition_accuracy = self.rewarding_accuracy['incorrect']
         
-        evaluation_is_accurate = random.random() < recognition_accuracy
+        evaluation_is_accurate = secrets.SystemRandom().random() < recognition_accuracy
         
         if evaluation_is_accurate:
             evaluation = VERIFY_CORRECT if actual_correct else VERIFY_WRONG
@@ -403,7 +403,7 @@ Corrected solution:"""
         if evaluation.evaluation == VERIFY_CORRECT:
             return attempt
         
-        correction_succeeds = random.random() < self.correction_accuracy
+        correction_succeeds = secrets.SystemRandom().random() < self.correction_accuracy
         
         if correction_succeeds:
             reasoning = f"Let me correct my previous solution to the problem '{problem.prompt}'... [improved reasoning] ... Therefore, the correct answer is {problem.correct_answer}."
@@ -425,7 +425,7 @@ Corrected solution:"""
         """Generate a plausibly wrong answer different from the correct one."""
         try:
             value = float(correct_answer)
-            perturbation = random.choice([0.9, 1.1, 0.5, 2.0, -1.0])
+            perturbation = secrets.choice([0.9, 1.1, 0.5, 2.0, -1.0])
             wrong_value = value * perturbation
             
             if correct_answer.isdigit():
@@ -439,7 +439,7 @@ Corrected solution:"""
                 f"-{correct_answer}",
                 "0"
             ]
-            return random.choice(options)
+            return secrets.choice(options)
 
 
 class Evaluator:
@@ -592,7 +592,7 @@ def run_experiment(num_problems=50,
         Dict containing the evaluation metrics and trajectories
     """
     if seed is not None:
-        random.seed(seed)
+        secrets.SystemRandom().seed(seed)
         np.random.seed(seed)
     
     # Sample or generate problems
